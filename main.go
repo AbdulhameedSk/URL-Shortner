@@ -25,5 +25,5 @@ func main() {
 }
 
 func setupRouters(router *gin.Engine) {
-	router.POST("/api/v1/shorten", routes.ShortenURL)
+	router.POST("/api/v1/shorten", routes.shorten)
 }

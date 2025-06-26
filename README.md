@@ -306,3 +306,94 @@ r.GET("/user/:id", func(c *gin.Context) {
 ---
 
 Let me know if you want to try handling **form submissions**, **file uploads**, or **cookies** with `*gin.Context` too!
+
+---
+----
+
+
+## 🧱 Using Redis in Go
+
+This project uses [go-redis v9](https://github.com/redis/go-redis) as the Redis client.
+
+### 📦 Installation
+
+Install the Redis client library:
+
+```bash
+go get github.com/redis/go-redis/v9
+```
+
+---
+
+### 📁 Setup (`database/redis.go`)
+
+```go
+package database
+
+import (
+    "context"
+    "os"
+
+    "github.com/redis/go-redis/v9"
+)
+
+var Ctx = context.Background()
+
+func CreateClient(dbNo int) *redis.Client {
+    rdb := redis.NewClient(&redis.Options{
+        Addr:     os.Getenv("DB_ADDR"), // e.g., "localhost:6379"
+        Password: os.Getenv("DB_PASS"), // leave blank if no password
+        DB:       dbNo,                 // Redis DB number (0–15)
+    })
+    return rdb
+}
+```
+
+---
+
+### 🔧 Store & Retrieve Data
+
+#### ➕ Set a Key
+
+```go
+rdb := database.CreateClient(0)
+err := rdb.Set(database.Ctx, "name", "Abdul", 0).Err()
+```
+
+#### 🔍 Get a Key
+
+```go
+val, err := rdb.Get(database.Ctx, "name").Result()
+fmt.Println("name is", val)
+```
+
+#### ⛔ Delete a Key
+
+```go
+rdb.Del(database.Ctx, "name")
+```
+
+#### ⏳ Set a Key with Expiry
+
+```go
+rdb.Set(database.Ctx, "session:123", "loggedin", time.Minute*10)
+```
+
+---
+
+### 🧪 Testing with Redis CLI (Optional)
+
+If Redis is installed locally:
+
+```bash
+redis-cli
+```
+
+```bash
+127.0.0.1:6379> SET name Abdul
+OK
+127.0.0.1:6379> GET name
+"Abdul"
+```
+
+---
